@@ -30,7 +30,7 @@ async function run() {
 
         const instructorCollection = client.db("sportsDB").collection('instructors');
         const classCollection = client.db("sportsDB").collection('classes');
-
+        const cartCollection = client.db("sportsDB").collection('carts');
 
         app.get('/instructors', async (req, res) => {
             const result = await instructorCollection.find().toArray();
@@ -43,7 +43,12 @@ async function run() {
 
 
         // cart collection
-
+        app.post('/carts', async (req, res) => {
+            const classCart = req.body;
+            console.log(classCart);
+            const result = await cartCollection.find().toArray();
+            res.send(result);
+        })
 
 
 
