@@ -28,19 +28,90 @@ async function run() {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
 
+        const userCollection = client.db("sportsDB").collection('users');
         const instructorCollection = client.db("sportsDB").collection('instructors');
         const classCollection = client.db("sportsDB").collection('classes');
         const cartCollection = client.db("sportsDB").collection('carts');
 
+
+
+        // users related apis 
+        app.get('/users', async (req, res) => {
+            const result = await userCollection.find().toArray();
+            res.send(result);
+        })
+
+
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            console.log(user);
+            const query = { email: user.email };
+            const existingUser = await userCollection.findOne(query);
+            console.log('existingUser', existingUser);
+            if (existingUser) {
+                return res.send({ message: 'User already exist' })
+            }
+            const result = await userCollection.insertOne(user);
+            res.send(result);
+        })
+
+
+        app.get('/users/:email', async (req, res) => {
+            const email = req.params.email;
+            console.log(user);
+            const query = { email: email };
+            const result = await userCollection.findOne(query);
+            res.send(result)
+        })
+
+
+
+
+        // instructor related apis
         app.get('/instructors', async (req, res) => {
             const result = await instructorCollection.find().toArray();
             res.send(result);
         })
+
+
+
+
+        // classes related apis
         app.get('/classes', async (req, res) => {
             const result = await classCollection.find().toArray();
             res.send(result);
         })
 
+
+        app.post('/classes', async (req, res) => {
+            const cls = req.body;
+            console.log(cls);
+            const result = await classCollection.insertOne(cls);
+            res.send(result);
+        })
+
+        app.patch('/classes/approve/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const updateDoc = {
+                $set: {
+                    status: 'approved'
+                }
+            };
+            const result = await classCollection.updateOne(filter, updateDoc);
+            res.send(result);
+        })
+        app.patch('/classes/denied/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const updateDoc = {
+                $set: {
+                    status: 'denied'
+                }
+            };
+            const result = await classCollection.updateOne(filter, updateDoc);
+            res.send(result);
+        })
 
         // cart collection apis
         app.get('/carts', async (req, res) => {
