@@ -1,9 +1,15 @@
-import { Router } from "express";
-import { getUsers, createUser } from "../controllers/user.controller";
+import { Router, Request, Response } from "express";
+import { verifyToken, requireRole } from "../middleware/auth";
 
 const router = Router();
 
-router.get("/", getUsers);
-router.post("/", createUser);
+router.get(
+  "/dashboard",
+  verifyToken,
+  requireRole("user"),
+  (req: Request, res: Response) => {
+    res.json({ message: "Welcome to User Dashboard" });
+  }
+);
 
 export default router;

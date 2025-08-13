@@ -1,10 +1,15 @@
-import { Router } from "express";
-import { approveClass, denyClass } from "../controllers/admin.controller";
-import { requireRole } from "../middleware/authMiddleware";
+import { Router, Request, Response } from "express";
+import { verifyToken, requireRole } from "../middleware/auth";
 
 const router = Router();
 
-router.patch("/classes/approve/:id", requireRole("admin"), approveClass);
-router.patch("/classes/deny/:id", requireRole("admin"), denyClass);
+router.get(
+  "/dashboard",
+  verifyToken,
+  requireRole("admin"),
+  (req: Request, res: Response) => {
+    res.json({ message: "Welcome to Admin Dashboard" });
+  }
+);
 
 export default router;
